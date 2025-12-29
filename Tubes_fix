@@ -1,0 +1,128 @@
+import time
+import sys
+
+# Fungsi untuk membalik string secara iteratif
+def reverse_iterative(string):
+    reversed_str = ""
+    for i in range(len(string) - 1, -1, -1):
+        reversed_str += string[i]
+    return reversed_str
+
+# Fungsi untuk membalik string secara rekursif
+def reverse_recursive(string):
+    if len(string) <= 1:
+        return string
+    return reverse_recursive(string[1:]) + string[0]
+
+# Fungsi untuk mengukur waktu eksekusi
+def measure_time(func, string, name):
+    start_time = time.perf_counter()
+    result = func(string)
+    end_time = time.perf_counter()
+    elapsed_time = (end_time - start_time) * 1000  # Konversi ke milidetik
+    return result, elapsed_time
+
+# Fungsi untuk menjalankan pengujian
+def run_tests():
+    print("=" * 60)
+    print("ANALISIS KOMPLEKSITAS ALGORITMA MEMBALIK STRING")
+    print("=" * 60)
+    
+    # Daftar ukuran input untuk diuji
+    test_sizes = [1, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000]
+    
+    print("\nHasil Pengujian:")
+    print("-" * 60)
+    print(f"{'Ukuran':<10} {'Iteratif (ms)':<15} {'Rekursif (ms)':<15} {'lebih cepat':<10}")
+    print("-" * 60)
+    
+    for size in test_sizes:
+        # Buat string dengan panjang tertentu
+        test_string = "a" * size
+        
+        # Ukur waktu untuk versi iteratif
+        result_iter, time_iter = measure_time(reverse_iterative, test_string, "Iteratif")
+        
+        # Ukur waktu untuk versi rekursif
+        result_rec, time_rec = measure_time(reverse_recursive, test_string, "Rekursif")
+        
+        if result_iter < result_rec:
+            results_match = time_rec/time_iter
+        else:
+            results_match = time_iter/time_rec
+        
+        print(f"{size:<10} {time_iter:<15.6f} {time_rec:<15.6f} {results_match:<10.2f}kali")
+        
+        # Untuk ukuran besar, rekursif mungkin mencapai recursion limit
+        if size > 1000:
+            try:
+                reverse_recursive(test_string)
+            except RecursionError:
+                print(f"  ⚠ Rekursif gagal (RecursionError) untuk ukuran {size}")
+                sys.setrecursionlimit(size * 2)
+    
+    print("-" * 60)
+
+# Fungsi untuk demo interaktif
+def interactive_demo():
+    print("\n" + "=" * 60)
+    print("DEMO INTERAKTIF MEMBALIK STRING")
+    print("=" * 60)
+    
+    while True:
+        user_input = input("\nMasukkan string yang ingin dibalik (atau 'exit' untuk keluar): ")
+        
+        if user_input.lower() == 'exit':
+            break
+        
+        print(f"\nString asli: {user_input}")
+        
+        # Iteratif
+        result_iter, time_iter = measure_time(reverse_iterative, user_input, "Iteratif")
+        print(f"Hasil Iteratif: {result_iter}")
+        print(f"Waktu Iteratif: {time_iter:.6f} ms")
+        
+        # Rekursif
+        result_rec, time_rec = measure_time(reverse_recursive, user_input, "Rekursif")
+        print(f"Hasil Rekursif: {result_rec}")
+        print(f"Waktu Rekursif: {time_rec:.6f} ms")
+        
+        # Perbandingan
+        if result_iter == result_rec:
+            print(f"✓ Hasil keduanya sama!")
+        else:
+            print(f"✗ Hasil berbeda!")
+        
+        if time_iter < time_rec:
+            print(f"→ Iteratif lebih cepat {time_rec/time_iter:.2f}x")
+        else:
+            print(f"→ Rekursif lebih cepat {time_iter/time_rec:.2f}x")
+
+# Menu utama
+def main():
+    print("PROGRAM ANALISIS ALGORITMA MEMBALIK STRING")
+    print("=" * 60)
+    
+    while True:
+        print("\nMenu:")
+        print("1. Jalankan pengujian dengan berbagai ukuran input")
+        print("2. Demo interaktif dengan string custom")
+        print("3. Analisis kompleksitas algoritma")
+        print("4. Keluar")
+        
+        choice = input("Pilih opsi (1-4): ")
+        
+        if choice == '1':
+            run_tests()
+        elif choice == '2':
+            interactive_demo()
+        elif choice == '4':
+            print("Terima kasih! Program selesai.")
+            break
+        else:
+            print("Pilihan tidak valid. Silakan coba lagi.")
+# Jalankan program
+if __name__ == "__main__":
+    # Tingkatkan recursion limit untuk pengujian
+    sys.setrecursionlimit(20000)
+    main()
